@@ -33,6 +33,7 @@ body{font-family:Heebo,system-ui,sans-serif}
 .level-adjust button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 9px;color:var(--muted);font-size:10px;font-weight:800}
 .level-adjust button.selected{border-color:var(--blue);background:#eaf3ff;color:var(--blue)}
 .level-badge{display:inline-block;margin-inline-start:6px;border-radius:8px;background:#eef3f7;padding:3px 7px;color:var(--muted);font-size:9px}
+.question-count{display:block;margin-top:4px;color:var(--muted);font-size:10px;font-weight:700}
 .dashboard-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.dashboard-actions .outline-btn{padding:9px 12px;font-size:11px}.quiet-danger{border:0;background:none;color:#b63831;font-size:11px;font-weight:900}
 @media(max-width:600px){.skill-row{grid-template-columns:1fr}.level-adjust{justify-content:flex-start}.difficulty-panel{padding:18px}}
 @media(max-width:520px){.dashboard-actions{grid-column:2;justify-content:flex-start}.hero:after{z-index:0}}

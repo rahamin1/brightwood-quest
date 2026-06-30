@@ -54,6 +54,135 @@ const BANK = {
   ]
 };
 
+function shuffled(items){
+  return [...items].sort(()=>Math.random()-.5);
+}
+
+function numberChoices(answer){
+  const candidates=[answer,Math.max(0,answer-1),answer+1,Math.max(0,answer-2),answer+2];
+  return shuffled([...new Set(candidates)].slice(0,4).map(String));
+}
+
+function generatedMath(level){
+  const questions=[];
+  const countMax=[5,8,10,12,15][level-1]||10;
+  const symbols=["⭐","🍎","🐟","🌼","🔵"];
+  symbols.forEach((symbol,symbolIndex)=>{
+    for(let n=1;n<=countMax;n++){
+      questions.push({id:`math-${level}-count-${symbolIndex}-${n}`,skill:"ספירה",type:"סופרים ובוחרים",q:`כמה פריטים אתם רואים?`,visual:Array(n).fill(symbol).join(" "),a:numberChoices(n),correct:String(n),explain:`סופרים כל פריט פעם אחת. יש כאן ${n} פריטים.`});
+    }
+  });
+  const sumMax=[5,8,10,15,20][level-1]||10;
+  for(let a=1;a<=Math.min(sumMax-1,8);a++){
+    for(let b=1;b<=Math.min(sumMax-a,6);b++){
+      const answer=a+b;
+      questions.push({id:`math-${level}-sum-${a}-${b}`,skill:"חיבור",type:"חיבור",q:`כמה הם ${a} ועוד ${b}?`,visual:`${a} + ${b}`,a:numberChoices(answer),correct:String(answer),explain:`${a} ועוד ${b} הם ${answer}.`,word:true});
+    }
+  }
+  const steps=level<=2?[1]:level<=4?[1,2]:[2,3,5];
+  steps.forEach(step=>{
+    for(let start=1;start<=10;start++){
+      const answer=start+step*3;
+      questions.push({id:`math-${level}-seq-${step}-${start}`,skill:"רצפים",type:"רצף מספרים",q:"איזה מספר מגיע עכשיו?",visual:`${start}  ·  ${start+step}  ·  ${start+step*2}  ·  ?`,a:numberChoices(answer),correct:String(answer),explain:`בכל צעד מוסיפים ${step}. לכן המספר הבא הוא ${answer}.`,word:true});
+    }
+  });
+  for(let a=1;a<=countMax;a++){
+    const b=((a*3)%countMax)+1;
+    if(a===b)continue;
+    const correct=a>b?String(a):String(b);
+    questions.push({id:`math-${level}-compare-${a}-${b}`,skill:"השוואה",type:"משווים מספרים",q:"איזה מספר גדול יותר?",visual:`${a}  ?  ${b}`,a:shuffled([String(a),String(b),"שווים","אי אפשר לדעת"]),correct,explain:`${correct} הוא המספר הגדול יותר.`,word:true});
+  }
+  return questions;
+}
+
+function generatedEnglish(level){
+  const words=[
+    ["A","🍎 Apple","Apple"],["B","🐻 Bear","Bear"],["C","🐱 Cat","Cat"],["D","🐶 Dog","Dog"],
+    ["E","🥚 Egg","Egg"],["F","🐟 Fish","Fish"],["G","🎁 Gift","Gift"],["H","🎩 Hat","Hat"],
+    ["I","🧊 Ice","Ice"],["J","🧃 Juice","Juice"],["K","🔑 Key","Key"],["L","🦁 Lion","Lion"],
+    ["M","🌙 Moon","Moon"],["N","👃 Nose","Nose"],["P","🐷 Pig","Pig"],["S","☀️ Sun","Sun"],
+    ["T","🌳 Tree","Tree"],["W","💧 Water","Water"]
+  ];
+  const limit=[6,9,12,15,words.length][level-1]||12;
+  const active=words.slice(0,limit);
+  const questions=[];
+  active.forEach(([letter,label,word],i)=>{
+    const distractors=shuffled(active.filter((_,j)=>j!==i).map(x=>x[1])).slice(0,3);
+    questions.push({id:`english-${level}-sound-${letter}`,skill:"צלילי אותיות",type:"צליל ראשון",q:`איזו מילה מתחילה באות ${letter}?`,visual:`${letter} ${letter.toLowerCase()}`,a:shuffled([label,...distractors]),correct:label,explain:`המילה ${word} מתחילה באות ${letter}.`,word:true});
+    const otherLetters=shuffled(active.filter(x=>x[0]!==letter).map(x=>x[0].toLowerCase())).slice(0,3);
+    questions.push({id:`english-${level}-match-${letter}`,skill:"אותיות",type:"התאמת אותיות",q:`איזו אות קטנה מתאימה ל־${letter}?`,visual:letter,a:shuffled([letter.toLowerCase(),...otherLetters]),correct:letter.toLowerCase(),explain:`${letter} גדולה ו־${letter.toLowerCase()} קטנה הן אותה אות.`,word:true});
+    const missing=word.slice(0,-1)+"_";
+    const correct=word.slice(-1).toUpperCase();
+    const endings=shuffled(active.map(x=>x[2].slice(-1).toUpperCase()).filter(x=>x!==correct));
+    questions.push({id:`english-${level}-spell-${word}`,skill:"איות",type:"בונים מילה",q:`איזו אות משלימה את המילה ${missing}?`,visual:label.split(" ")[0],a:shuffled([correct,...new Set(endings)].slice(0,4)),correct,explain:`האות ${correct} משלימה את המילה ${word}.`,word:true});
+  });
+  const rhymes=[["Cat","Hat"],["Dog","Frog"],["Sun","Fun"],["Pig","Big"],["Bee","Tree"],["Fox","Box"],["Cake","Snake"],["Moon","Spoon"],["Light","Kite"],["Star","Car"]];
+  rhymes.slice(0,level+5).forEach(([word,correct],i)=>{
+    const wrong=shuffled(rhymes.filter((_,j)=>j!==i).map(x=>x[1])).slice(0,3);
+    questions.push({id:`english-${level}-rhyme-${word}`,skill:"חריזה",type:"מילים מתחרזות",q:`איזו מילה מתחרזת עם ${word}?`,visual:word.toUpperCase(),a:shuffled([correct,...wrong]),correct,explain:`${word} ו־${correct} מסתיימות באותו צליל.`,word:true});
+  });
+  return questions;
+}
+
+function generatedReading(level){
+  const stories=[
+    ["נועה לבשה מעיל ולקחה מטרייה. מה כנראה קרה בחוץ?","ירד גשם",["היה חם","ירד שלג","היה לילה"],"הסקת מסקנות","🌧️"],
+    ["אורי שתל זרע והשקה אותו בכל יום. מה צפוי לצמוח?","צמח",["סלע","כיסא","כדור"],"רצף אירועים","🌱"],
+    ["דנה נתנה לכלב קערת מים. מי קיבל מים?","הכלב",["דנה","החתול","הציפור"],"איתור מידע","🐶"],
+    ["יואב מצא את הכדור שאבד לו. איך הוא הרגיש?","שמח",["כועס","רעב","עייף"],"הבנת רגשות","⚽"],
+    ["הפרפר הסגול נח על פרח צהוב. מה היה צבע הפרפר?","סגול",["צהוב","אדום","כחול"],"איתור מידע","🦋"],
+    ["מיה שמעה רעם חזק והתחבאה מתחת לשמיכה. איך היא הרגישה?","מפוחדת",["גאה","רעבה","משועממת"],"הבנת רגשות","⛈️"],
+    ["תום סיים לצחצח שיניים ונכנס למיטה. מה הוא יעשה עכשיו?","ילך לישון",["יאכל ארוחת בוקר","ילך לבית הספר","ישחק בגשם"],"רצף אירועים","🌙"],
+    ["רוני מילאה בקבוק לפני הטיול. מה יש בבקבוק?","מים",["חול","גרביים","ספרים"],"איתור מידע","💧"],
+    ["החתול ישב ליד הדלת ויילל. מה הוא אולי רוצה?","לצאת",["לקרוא ספר","לצייר","לעוף"],"הסקת מסקנות","🐱"],
+    ["דן חלק את העוגייה שלו עם חבר. איזה ילד הוא דן?","נדיב",["כועס","רועש","עייף"],"הבנת רגשות","🍪"],
+    ["קודם לובשים גרביים ואז נועלים נעליים. מה לובשים קודם?","גרביים",["נעליים","כובע","מעיל"],"רצף אירועים","🧦"],
+    ["הציפור בנתה קן גבוה בעץ. איפה נמצא הקן?","בעץ",["בים","בבית","מתחת לאדמה"],"איתור מידע","🪺"],
+    ["עננים שחורים כיסו את השמיים. מה עשוי לקרות?","ירד גשם",["הירח יזרח","השלג יימס","יהיה חם מאוד"],"הסקת מסקנות","☁️"],
+    ["ליה קיבלה מתנה והודתה לחברתה. איך ליה התנהגה?","בנימוס",["בכעס","בפחד","בעייפות"],"הבנת רגשות","🎁"],
+    ["אחרי שהבצק נאפה בתנור, הפך ללחם. מה קרה קודם?","הבצק נאפה",["הלחם נאכל","הלחם נחתך","הלחם התקרר"],"רצף אירועים","🍞"],
+    ["הסירה האדומה שטה באגם השקט. מה היה צבע הסירה?","אדום",["ירוק","לבן","כחול"],"איתור מידע","⛵"],
+    ["עדי כיבה את האור וראה כוכבים בחלון. באיזו שעה זה קרה?","בלילה",["בבוקר","בצהריים","בזריחה"],"הסקת מסקנות","⭐"],
+    ["גיל עזר לאחותו להרים את הספרים שנפלו. מה גיל עשה?","עזר",["צחק","ברח","ישן"],"איתור מידע","📚"]
+  ];
+  return stories.map(([q,correct,wrong,skill,visual],i)=>({id:`reading-${level}-${i}`,skill,type:skill,q,visual,a:shuffled([correct,...wrong]),correct,explain:`התשובה נמצאת ברמזים שבסיפור: ${correct}.`}));
+}
+
+function generatedNature(level){
+  const facts=[
+    ["איזו חיה חיה בים?","🐬 דולפין",["🐫 גמל","🐓 תרנגול","🐿️ סנאי"],"בעלי חיים","🌊"],
+    ["איזו חיה חיה במדבר?","🐫 גמל",["🐧 פינגווין","🐬 דולפין","🐸 צפרדע"],"בעלי חיים","🏜️"],
+    ["איזו חיה מטילה ביצים?","🐔 תרנגולת",["🐄 פרה","🐱 חתול","🐶 כלב"],"בעלי חיים","🥚"],
+    ["מה לובשים ביום קר?","מעיל",["בגד ים","כפכפים","משקפי שחייה"],"מזג אוויר","❄️"],
+    ["מה עוזר לנו ביום שמש חזק?","כובע",["מטרייה סגורה","צעיף צמר","מגפיים"],"מזג אוויר","☀️"],
+    ["מה מגיע מהעננים?","גשם",["חול","אבנים","עלים"],"מזג אוויר","☁️"],
+    ["מה צריך צמח כדי לגדול?","מים ואור",["פלסטיק","צעצועים","צבע"],"חי וצומח","🌱"],
+    ["איזה חלק של הצמח נמצא באדמה?","שורשים",["פרחים","עלים","פירות"],"חי וצומח","🌿"],
+    ["מה מהדברים הבאים הוא יצור חי?","עץ",["כיסא","אבן","כוס"],"חי וצומח","🌳"],
+    ["מה רואים בשמיים ביום?","שמש",["פנס רחוב","נר","כוכב ים"],"יום ולילה","🌞"],
+    ["מתי בדרך כלל ישנים?","בלילה",["בצהריים בבית הספר","בבוקר בגן","בזמן ארוחת ערב"],"יום ולילה","🌙"],
+    ["איזו חיה עושה הב־הב?","🐶 כלב",["🐱 חתול","🐄 פרה","🐑 כבשה"],"בעלי חיים","🎵"],
+    ["איזו חיה עושה מיאו?","🐱 חתול",["🐴 סוס","🐷 חזיר","🐔 תרנגולת"],"בעלי חיים","🎵"],
+    ["מה קורה למים בקור חזק?","הם קופאים",["הם נשרפים","הם נעלמים מיד","הם הופכים לחול"],"מזג אוויר","🧊"],
+    ["באיזו עונה נושרים עלים רבים?","סתיו",["אביב","קיץ","חורף חם"],"מזג אוויר","🍂"],
+    ["מי מאביק פרחים?","דבורה",["דג","חתול","צב"],"חי וצומח","🐝"],
+    ["איזו חיה פעילה לעיתים בלילה?","ינשוף",["פרפר","תרנגולת","דבורה"],"יום ולילה","🦉"],
+    ["מהו הבית של ציפור?","קן",["מאורה","כוורת","אקווריום"],"בעלי חיים","🪺"],
+    ["איפה חיה צפרדע?","ליד מים",["במדבר יבש","על הירח","בשלג עמוק"],"בעלי חיים","🐸"],
+    ["מה שומר על כדור הארץ נקי?","לזרוק לפח",["להשאיר אשפה","לבזבז מים","לשבור עצים"],"סביבה","♻️"],
+    ["מה אפשר למחזר?","בקבוק פלסטיק",["קליפת בננה מלוכלכת","אבן","מים"],"סביבה","♻️"],
+    ["איזה איבר עוזר לדג לנשום במים?","זימים",["כנפיים","פרווה","קרניים"],"בעלי חיים","🐟"]
+  ];
+  const count=Math.min(facts.length,12+level*2);
+  return facts.slice(0,count).map(([q,correct,wrong,skill,visual],i)=>({id:`nature-${level}-${i}`,skill,type:skill,q,visual,a:shuffled([correct,...wrong]),correct,explain:`התשובה הנכונה היא ${correct}.`}));
+}
+
+function buildQuestionPool(subject,level,p){
+  const generated=subject==="math"?generatedMath(level):subject==="english"?generatedEnglish(level):subject==="reading"?generatedReading(level):generatedNature(level);
+  const base=BANK[subject].map((q,i)=>({...adaptedQuestion(q,p,subject),id:`${subject}-${level}-base-${i}`}));
+  return [...generated,...base];
+}
+
 const storeKey = "brightwood-quest-v1";
 let state = JSON.parse(localStorage.getItem(storeKey) || '{"profiles":[],"activeId":null,"sound":true}');
 let session = null;
@@ -74,9 +203,11 @@ function prepareProfile(p){
   p.stars ||= 0; p.streak ||= 0; p.correct ||= 0; p.answered ||= 0; p.minutes ||= 0; p.daily ||= 0;
   p.skillLevels ||= {};
   p.skillFeedback ||= {};
+  p.recentQuestions ||= {};
   Object.keys(SUBJECTS).forEach(key => {
     p.skillLevels[key] ||= {};
     p.skillFeedback[key] ||= {};
+    p.recentQuestions[key] ||= [];
     [...new Set(BANK[key].map(q=>q.skill))].forEach(skill => p.skillLevels[key][skill] ||= ageLevel(p.age));
   });
   return p;
@@ -208,7 +339,14 @@ function adaptedQuestion(q,p,subject){
 
 function startGame(subject){
   const p=activeProfile(); if(!p){openCreate();return}
-  const questions=[...BANK[subject]].sort(()=>Math.random()-.5).slice(0,5).map(q=>adaptedQuestion(q,p,subject));
+  const level=subjectLevel(p,subject);
+  const pool=buildQuestionPool(subject,level,p);
+  const recent=new Set(p.recentQuestions[subject]||[]);
+  let available=pool.filter(q=>!recent.has(q.id));
+  if(available.length<5)available=pool;
+  const questions=shuffled(available).slice(0,5).map(q=>({...q,a:shuffled(q.a)}));
+  p.recentQuestions[subject]=[...(p.recentQuestions[subject]||[]),...questions.map(q=>q.id)].slice(-Math.min(30,Math.max(10,pool.length-5)));
+  save();
   session={subject,questions,index:0,correct:0,start:Date.now(),locked:false,results:{}};
   showScreen("gameScreen"); renderQuestion();
 }
@@ -325,20 +463,21 @@ function renderDashboard(){
 
 function renderDifficulty(p){
   $("#difficultyControls").innerHTML=p.subjects.map(key=>{
-    const skills=[...new Set(BANK[key].map(q=>q.skill))];
-    const rows=skills.map(skill=>{
-      const feedback=p.skillFeedback[key][skill]||"ok", level=p.skillLevels[key][skill];
-      return `<div class="skill-row"><span>${skill}<small class="level-badge">שלב ${level}</small></span><div class="level-adjust"><button class="${feedback==="up"?"selected":""}" data-adjust="${key}|${escapeHtml(skill)}|up">קל מדי</button><button class="${feedback==="ok"?"selected":""}" data-adjust="${key}|${escapeHtml(skill)}|ok">מתאים</button><button class="${feedback==="down"?"selected":""}" data-adjust="${key}|${escapeHtml(skill)}|down">קשה מדי</button></div></div>`;
-    }).join("");
-    return `<section class="difficulty-subject"><h3>${SUBJECTS[key].icon} ${SUBJECTS[key].name}</h3>${rows}</section>`;
+    const feedback=p.skillFeedback[key]._subject||"ok", level=subjectLevel(p,key);
+    return `<section class="difficulty-subject"><div class="skill-row"><span><b>${SUBJECTS[key].icon} ${SUBJECTS[key].name}</b><small class="level-badge">שלב ${level}</small><small class="question-count">מאגר שאלות רחב ברמה זו</small></span><div class="level-adjust"><button class="${feedback==="up"?"selected":""}" data-adjust="${key}|up">קל מדי</button><button class="${feedback==="ok"?"selected":""}" data-adjust="${key}|ok">מתאים</button><button class="${feedback==="down"?"selected":""}" data-adjust="${key}|down">קשה מדי</button></div></div></section>`;
   }).join("");
 }
 
 function adjustDifficulty(data){
-  const [subject,skill,choice]=data.split("|"),p=activeProfile(),current=p.skillLevels[subject][skill]||ageLevel(p.age);
-  p.skillFeedback[subject][skill]=choice;
-  if(choice==="up")p.skillLevels[subject][skill]=clamp(current+1,1,5);
-  if(choice==="down")p.skillLevels[subject][skill]=clamp(current-1,1,5);
+  const [subject,choice]=data.split("|"),p=activeProfile();
+  const skills=Object.keys(p.skillLevels[subject]);
+  p.skillFeedback[subject]._subject=choice;
+  skills.forEach(skill=>{
+    const current=p.skillLevels[subject][skill]||ageLevel(p.age);
+    if(choice==="up")p.skillLevels[subject][skill]=clamp(current+1,1,5);
+    if(choice==="down")p.skillLevels[subject][skill]=clamp(current-1,1,5);
+  });
+  p.recentQuestions[subject]=[];
   save(); renderDashboard(); renderSubjects();
 }
 
@@ -358,7 +497,7 @@ function exportProgress(){
 function resetProgress(){
   const p=activeProfile(); if(!p)return;
   if(!confirm(`לאפס את כל ההתקדמות של ${p.name}? הפעולה אינה ניתנת לביטול.`))return;
-  Object.assign(p,{stars:0,streak:0,progress:{},log:[],correct:0,answered:0,minutes:0,daily:0,dailyDate:"",skillLevels:{},skillFeedback:{}});
+  Object.assign(p,{stars:0,streak:0,progress:{},log:[],correct:0,answered:0,minutes:0,daily:0,dailyDate:"",skillLevels:{},skillFeedback:{},recentQuestions:{}});
   prepareProfile(p); save(); renderAll(); renderDashboard();
 }
 
