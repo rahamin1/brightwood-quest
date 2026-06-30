@@ -240,10 +240,23 @@ function speakQuestion(){
     const isEnglish=/[A-Za-z]/.test(part);
     const utter=new SpeechSynthesisUtterance(part);
     utter.lang=isEnglish?"en-US":"he-IL";
-    utter.rate=isEnglish ? .72 : .82;
-    utter.pitch=1.08;
+    utter.voice=pickNaturalVoice(utter.lang);
+    utter.rate=isEnglish ? .86 : .92;
+    utter.pitch=1;
+    utter.volume=1;
     speechSynthesis.speak(utter);
   });
+}
+
+function pickNaturalVoice(lang){
+  const prefix=lang.split("-")[0].toLowerCase();
+  const voices=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().startsWith(prefix));
+  if(!voices.length)return null;
+  const preferred=["natural","premium","enhanced","google","siri","carmit","avri","hila","microsoft"];
+  return [...voices].sort((a,b)=>{
+    const score=v=>preferred.reduce((total,word,index)=>total+(v.name.toLowerCase().includes(word)?preferred.length-index:0),0)+(v.localService?1:0);
+    return score(b)-score(a);
+  })[0];
 }
 
 function answer(value,button){
