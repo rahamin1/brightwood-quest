@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@500;600;700;800;900&family=Rubik:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
   <div id="app">
@@ -65,7 +65,7 @@
             </article>
             <button class="grownups-card" id="dashboardButton">
               <span class="grownups-icon">📊</span>
-              <span><small>למבוגרים</small><b>צפייה בהתקדמות והגדרות</b></span>
+              <span><b>צפייה בהתקדמות והגדרות</b></span>
               <i>←</i>
             </button>
           </div>
@@ -83,7 +83,6 @@
             <div class="pip-corner">🦊<span id="pipPrompt">קטן עליכם!</span></div>
             <span class="eyebrow blue" id="questionType">סופרים ובוחרים</span>
             <h2 id="questionText">כמה כוכבים אתם רואים?</h2>
-            <button class="listen-btn" id="listenAgain">🔊 לשמוע שוב</button>
             <div id="questionVisual" class="question-visual"></div>
             <div id="answerGrid" class="answer-grid"></div>
             <div id="feedback" class="feedback"></div>
@@ -96,7 +95,7 @@
         <div class="dashboard-wrap">
           <div class="dashboard-head">
             <button class="back-btn" data-go="home">→</button>
-            <div><span class="eyebrow blue">האזור של המבוגרים</span><h1>מסע הלמידה</h1><p id="dashboardSubtitle">תמונה נעימה של ההתקדמות האחרונה.</p></div>
+            <div><span class="eyebrow blue">צפייה בהתקדמות והגדרות</span><h1>מסע הלמידה</h1><p id="dashboardSubtitle">תמונה נעימה של ההתקדמות האחרונה.</p></div>
             <div class="dashboard-actions">
               <button class="outline-btn" id="printReport">הדפסת דוח</button>
               <button class="outline-btn" id="exportReport">ייצוא נתונים</button>
@@ -156,6 +155,16 @@
       </div>
     </div>
 
+    <div class="modal-backdrop" id="adventureModal">
+      <div class="modal adventure-modal">
+        <button class="modal-close" data-close="adventureModal">×</button>
+        <span class="eyebrow blue">בוחרים הרפתקה</span>
+        <h2>באיזה נושא משחקים?</h2>
+        <p>בחרו שביל כדי להתחיל.</p>
+        <div id="adventureChoices" class="adventure-choices"></div>
+      </div>
+    </div>
+
     <div class="modal-backdrop" id="celebrationModal">
       <div class="modal celebration-modal">
         <div class="confetti">★ ✦ ● ★ ✦</div>
@@ -170,15 +179,15 @@
     <div class="modal-backdrop" id="adultGateModal">
       <form class="modal adult-gate" id="adultGateForm">
         <button type="button" class="modal-close" data-close="adultGateModal">×</button>
-        <span class="eyebrow blue">כניסת מבוגרים</span>
+        <span class="eyebrow blue">כניסה לצפייה בהתקדמות והגדרות</span>
         <h2>בדיקה קטנה</h2>
-        <p>כמה הם 17 כפול 6, פחות 9?</p>
+        <p id="adultQuestion">כמה הם 17 כפול 6, פחות 9?</p>
         <input id="adultAnswer" inputmode="numeric" maxlength="3" placeholder="התשובה" required>
         <p class="gate-error" id="gateError"></p>
         <button class="primary-btn full" type="submit">כניסה ללוח ההתקדמות</button>
       </form>
     </div>
   </div>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

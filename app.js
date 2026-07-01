@@ -7,13 +7,13 @@ const SUBJECTS = {
 
 const BUDDIES = ["🦊", "🐼", "🐰", "🦁"];
 const BUDDY_IMAGES = {
-  "🦊": "assets/brightwood-world.png",
+  "🦊": "assets/brightwood-fox.png",
   "🐼": "assets/brightwood-panda.png",
   "🐰": "assets/brightwood-rabbit.png",
   "🦁": "assets/brightwood-lion.png"
 };
 const BUDDY_IMAGES_OLDER = {
-  "🦊": "assets/brightwood-older-red-panda.png",
+  "🦊": "assets/brightwood-older-fox.png",
   "🐼": "assets/brightwood-older-panda.png",
   "🐰": "assets/brightwood-older-rabbit.png",
   "🦁": "assets/brightwood-older-lion.png"
@@ -151,7 +151,7 @@ function generatedReading(level){
 function generatedNature(level){
   const facts=[
     ["איזו חיה חיה בים?","🐬 דולפין",["🐫 גמל","🐓 תרנגול","🐿️ סנאי"],"בעלי חיים","🌊"],
-    ["איזו חיה חיה במדבר?","🐫 גמל",["🐧 פינגווין","🐬 דולפין","🐸 צפרדע"],"בעלי חיים","🏜️"],
+    ["איזה בעל חיים חי במדבר?","🐫 גמל",["🐧 פינגווין","🐬 דולפין","🐸 צפרדע"],"בעלי חיים","🏜️"],
     ["איזו חיה מטילה ביצים?","🐔 תרנגולת",["🐄 פרה","🐱 חתול","🐶 כלב"],"בעלי חיים","🥚"],
     ["מה לובשים ביום קר?","מעיל",["בגד ים","כפכפים","משקפי שחייה"],"מזג אוויר","❄️"],
     ["מה עוזר לנו ביום שמש חזק?","כובע",["מטרייה סגורה","צעיף צמר","מגפיים"],"מזג אוויר","☀️"],
@@ -177,8 +177,36 @@ function generatedNature(level){
   return facts.slice(0,count).map(([q,correct,wrong,skill,visual],i)=>({id:`nature-${level}-${i}`,skill,type:skill,q,visual,a:shuffled([correct,...wrong]),correct,explain:`התשובה הנכונה היא ${correct}.`}));
 }
 
+function generatedNaturePreschool(){
+  const questions=[
+    ["איזו חיה חיה בים?","🐠",["🐰","🦁","🐔"],"בעלי חיים","🌊"],
+    ["איזה בעל חיים חי במדבר?","🐪",["🐧","🐬","🐸"],"בעלי חיים","🏜️"],
+    ["איזו חיה מטילה ביצים?","🐔",["🐄","🐱","🐶"],"בעלי חיים","🥚"],
+    ["איזו חיה עושה מוּ?","🐄",["🐷","🐑","🐴"],"בעלי חיים","🎵"],
+    ["איזו חיה עושה מיאו?","🐱",["🐶","🐮","🐸"],"בעלי חיים","🎵"],
+    ["איזו חיה יכולה לעוף?","🦋",["🐢","🐟","🐘"],"בעלי חיים","☁️"],
+    ["איזו חיה חיה בקן?","🐦",["🐠","🐘","🐄"],"בעלי חיים","🪺"],
+    ["איזו חיה אוהבת לקפוץ?","🐰",["🐌","🐢","🐟"],"בעלי חיים","🌿"],
+    ["מה לובשים כשיורד גשם?","🧥",["👙","🩴","👒"],"מזג אוויר","🌧️"],
+    ["מה עוזר ביום שמש?","👒",["🧣","🥾","🧤"],"מזג אוויר","☀️"],
+    ["מה רואים בשמיים בלילה?","🌙",["🌈","🪁","🌻"],"יום ולילה","🌌"],
+    ["מה רואים בשמיים ביום?","☀️",["🌙","⭐","🕯️"],"יום ולילה","🌤️"],
+    ["מה מהדברים הבאים גדל?","🌱",["🪨","🥄","👟"],"חי וצומח","💧"],
+    ["מי עוזרת לפרחים?","🐝",["🐟","🐱","🐢"],"חי וצומח","🌸"],
+    ["מה צריך צמח?","💧",["🧸","🚗","🎈"],"חי וצומח","🌱"],
+    ["איזה פרי גדל על עץ?","🍎",["🥕","🥔","🧅"],"חי וצומח","🌳"],
+    ["מה מתאים ליום קר?","🧣",["🩱","🕶️","🩴"],"מזג אוויר","❄️"],
+    ["מה מגיע מעננים כהים?","🌧️",["🔥","🏖️","🌵"],"מזג אוויר","☁️"],
+    ["איזו חיה חיה ליד מים?","🐸",["🦒","🐪","🐓"],"בעלי חיים","💦"],
+    ["מה שומרים בתוך כוורת?","🍯",["🧊","🪨","🧦"],"חי וצומח","🐝"]
+  ];
+  return questions.map(([q,correct,wrong,skill,visual],i)=>({id:`nature-preschool-${i}`,skill,type:skill,q,visual,a:shuffled([correct,...wrong]),correct,explain:`התשובה הנכונה היא ${correct}.`}));
+}
+
 function buildQuestionPool(subject,level,p){
   const generated=subject==="math"?generatedMath(level):subject==="english"?generatedEnglish(level):subject==="reading"?generatedReading(level):generatedNature(level);
+  if(subject==="math"&&p.age<=4)return generated.filter(q=>q.skill==="ספירה");
+  if(subject==="nature"&&p.age<=4)return generatedNaturePreschool();
   const base=BANK[subject].map((q,i)=>({...adaptedQuestion(q,p,subject),id:`${subject}-${level}-base-${i}`}));
   return [...generated,...base];
 }
@@ -189,13 +217,16 @@ let session = null;
 let selectedAge = 5;
 let selectedBuddy = "🦊";
 let editingId = null;
-let adultUnlocked = false;
+let adultChallengeAnswer = 93;
+let lastAdultChallenge = "";
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
 
 function activeProfile(){ return state.profiles.find(p => p.id === state.activeId); }
 function ageLevel(age){ return age <= 4 ? 1 : age === 5 ? 2 : age === 6 ? 3 : 4; }
+function subjectName(p,key){ return key==="math"&&p?.age<=4?"מספרים":SUBJECTS[key].name; }
+function subjectDescription(p,key){ return key==="math"&&p?.age<=4?"סופרים עצמים ומשחקים במספרים":SUBJECTS[key].desc; }
 function prepareProfile(p){
   p.subjects ||= ["math","english"];
   p.progress ||= {};
@@ -210,6 +241,11 @@ function prepareProfile(p){
     p.recentQuestions[key] ||= [];
     [...new Set(BANK[key].map(q=>q.skill))].forEach(skill => p.skillLevels[key][skill] ||= ageLevel(p.age));
   });
+  if(!p.mathBoostVersion){
+    Object.keys(p.skillLevels.math).forEach(skill=>p.skillLevels.math[skill]=clamp(p.skillLevels.math[skill]+1,1,5));
+    p.mathBoostVersion=1;
+    p.recentQuestions.math=[];
+  }
   return p;
 }
 state.profiles.forEach(prepareProfile);
@@ -250,6 +286,7 @@ function renderAll(){
   renderSubjects();
   renderProfiles();
   renderSubjectToggles();
+  renderAdventureChoices();
   if($("#dashboardScreen").classList.contains("active")) renderDashboard();
 }
 
@@ -278,7 +315,7 @@ function renderSubjects(){
   const p=activeProfile(), chosen=p?.subjects||["math","english","reading","nature"];
   $("#subjectGrid").innerHTML=chosen.map(key=>{
     const s=SUBJECTS[key], level=p?subjectLevel(p,key):1;
-    return `<button class="subject-card ${s.class}" data-subject="${key}"><span class="level-chip">שלב ${level}</span><span class="icon">${s.icon}</span><h3>${s.name}</h3><p>${s.desc}</p><span class="go">←</span></button>`;
+    return `<button class="subject-card ${s.class}" data-subject="${key}"><span class="level-chip">שלב ${level}</span><span class="icon">${s.icon}</span><h3>${subjectName(p,key)}</h3><p>${subjectDescription(p,key)}</p><span class="go">←</span></button>`;
   }).join("");
 }
 
@@ -287,8 +324,13 @@ function renderProfiles(){
 }
 
 function renderSubjectToggles(){
-  const chosen=activeProfile()?.subjects||Object.keys(SUBJECTS);
-  $("#subjectToggles").innerHTML=Object.entries(SUBJECTS).map(([k,s])=>`<button class="subject-toggle ${chosen.includes(k)?"selected":""}" data-toggle-subject="${k}">${s.icon} ${s.name}<br><small>${s.desc}</small></button>`).join("");
+  const p=activeProfile(),chosen=p?.subjects||Object.keys(SUBJECTS);
+  $("#subjectToggles").innerHTML=Object.entries(SUBJECTS).map(([k,s])=>`<button class="subject-toggle ${chosen.includes(k)?"selected":""}" data-toggle-subject="${k}">${s.icon} ${subjectName(p,k)}<br><small>${subjectDescription(p,k)}</small></button>`).join("");
+}
+
+function renderAdventureChoices(){
+  const p=activeProfile();
+  $("#adventureChoices").innerHTML=(p?.subjects||[]).map(key=>`<button class="adventure-choice" data-play-subject="${key}"><span>${SUBJECTS[key].icon}</span>${subjectName(p,key)}<small>${subjectDescription(p,key)}</small></button>`).join("");
 }
 
 function openCreate(){
@@ -320,7 +362,7 @@ function submitProfile(name){
     editingId=null;
   } else {
     const p=prepareProfile({id:Date.now().toString(),name:name.trim(),age:selectedAge,buddy:selectedBuddy,subjects:["math","english"],stars:0,streak:0,progress:{},log:[],correct:0,answered:0,minutes:0,daily:0,dailyDate:""});
-    state.profiles.push(p); state.activeId=p.id; save(); closeModal("createModal"); renderAll(); openModal("subjectModal");
+    state.profiles.push(p); state.activeId=p.id; session=null; save(); closeModal("createModal"); renderAll(); showScreen("homeScreen"); openModal("subjectModal");
   }
 }
 
@@ -353,7 +395,7 @@ function startGame(subject){
 
 function renderQuestion(){
   const q=session.questions[session.index], s=SUBJECTS[session.subject], p=activeProfile();
-  $("#gameSubject").textContent="שביל "+s.name;
+  $("#gameSubject").textContent="שביל "+subjectName(p,session.subject);
   $("#gameLevel").textContent=`שלב ${subjectLevel(p,session.subject)} · ${s.trail}`;
   $("#questionLabel").textContent=`${session.index+1} מתוך ${session.questions.length}`;
   $("#questionBar").style.width=`${session.index/session.questions.length*100}%`;
@@ -365,41 +407,12 @@ function renderQuestion(){
   $(".pip-corner").firstChild.textContent=p.buddy;
   $("#pipPrompt").textContent=["יש לכם זמן!","קטן עליכם!","חשיבה מצוינת!"][session.index%3];
   $("#answerGrid").innerHTML=q.a.map(a=>`<button class="answer-btn" data-answer="${escapeHtml(a)}">${a}</button>`).join("");
+  $("#answerGrid").classList.toggle("image-answers",session.subject==="nature"&&p.age<=4);
   session.locked=false;
-  setTimeout(()=>speakQuestion(),250);
-}
-
-function speakQuestion(){
-  if(!state.sound || !("speechSynthesis" in window) || !session)return;
-  speechSynthesis.cancel();
-  const q=session.questions[session.index];
-  const parts=q.q.split(/([A-Za-z]+(?:\s+[A-Za-z]+)*)/g).filter(part=>part.trim());
-  parts.forEach(part=>{
-    const isEnglish=/[A-Za-z]/.test(part);
-    const utter=new SpeechSynthesisUtterance(part);
-    utter.lang=isEnglish?"en-US":"he-IL";
-    utter.voice=pickNaturalVoice(utter.lang);
-    utter.rate=isEnglish ? .86 : .92;
-    utter.pitch=1;
-    utter.volume=1;
-    speechSynthesis.speak(utter);
-  });
-}
-
-function pickNaturalVoice(lang){
-  const prefix=lang.split("-")[0].toLowerCase();
-  const voices=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().startsWith(prefix));
-  if(!voices.length)return null;
-  const preferred=["natural","premium","enhanced","google","siri","carmit","avri","hila","microsoft"];
-  return [...voices].sort((a,b)=>{
-    const score=v=>preferred.reduce((total,word,index)=>total+(v.name.toLowerCase().includes(word)?preferred.length-index:0),0)+(v.localService?1:0);
-    return score(b)-score(a);
-  })[0];
 }
 
 function answer(value,button){
   if(session.locked)return; session.locked=true;
-  window.speechSynthesis?.cancel();
   const q=session.questions[session.index], right=value===q.correct, p=activeProfile();
   session.results[q.skill] ||= {correct:0,total:0}; session.results[q.skill].total++;
   p.answered++;
@@ -445,7 +458,7 @@ function renderDashboard(){
   $("#dashTime").textContent=p.minutes+" דקות";
   $("#subjectProgress").innerHTML=Object.entries(SUBJECTS).map(([k,s])=>{
     const x=p.progress[k],pct=x?Math.min(x.completed/10*100,100):0;
-    return `<div class="progress-row"><span class="trail-icon">${s.icon}</span><b>${s.name}</b><div class="bar"><i style="width:${pct}%"></i></div><small>${x?.completed||0}/10</small></div>`;
+    return `<div class="progress-row"><span class="trail-icon">${s.icon}</span><b>${subjectName(p,k)}</b><div class="bar"><i style="width:${pct}%"></i></div><small>${x?.completed||0}/10</small></div>`;
   }).join("");
   $("#activityLog").innerHTML=p.log.length?p.log.map(x=>`<div class="log-row"><span class="log-icon">${SUBJECTS[x.subject].icon}</span><div><b>${SUBJECTS[x.subject].trail}</b><small>${x.correct} מתוך ${x.total} תשובות נכונות · ${x.date}</small></div></div>`).join(""):`<div class="empty-state">עוד אין הרפתקאות. בחרו שביל והסיפור מתחיל!</div>`;
   renderDifficulty(p);
@@ -454,7 +467,8 @@ function renderDashboard(){
   if(p.answered&&skills.length){
     const weak=[...skills].sort((a,b)=>a.level-b.level)[0];
     $("#insightTitle").textContent=`כדאי לתרגל: ${weak.skill}`;
-    $("#insightText").textContent=`אפשר לחזק את ${weak.skill} בנושא ${SUBJECTS[weak.subject].name}. המשחק יתאים את השאלות בהדרגה, בקצב נעים וללא לחץ.`;
+    const skillInSentence=weak.skill==="צלילי אותיות"?"צלילי האותיות":weak.skill;
+    $("#insightText").textContent=`אפשר לחזק את ${skillInSentence} בנושא ${subjectName(p,weak.subject)}. המשחק יתאים את השאלות בהדרגה, בקצב נעים וללא לחץ.`;
   } else {
     $("#insightTitle").textContent="מוכנים להרפתקה הראשונה";
     $("#insightText").textContent="השלימו שביל ופיפ ישתף כאן תובנה על הלמידה.";
@@ -464,7 +478,7 @@ function renderDashboard(){
 function renderDifficulty(p){
   $("#difficultyControls").innerHTML=p.subjects.map(key=>{
     const feedback=p.skillFeedback[key]._subject||"ok", level=subjectLevel(p,key);
-    return `<section class="difficulty-subject"><div class="skill-row"><span><b>${SUBJECTS[key].icon} ${SUBJECTS[key].name}</b><small class="level-badge">שלב ${level}</small><small class="question-count">מאגר שאלות רחב ברמה זו</small></span><div class="level-adjust"><button class="${feedback==="up"?"selected":""}" data-adjust="${key}|up">קל מדי</button><button class="${feedback==="ok"?"selected":""}" data-adjust="${key}|ok">מתאים</button><button class="${feedback==="down"?"selected":""}" data-adjust="${key}|down">קשה מדי</button></div></div></section>`;
+    return `<section class="difficulty-subject"><div class="skill-row"><span><b>${SUBJECTS[key].icon} ${subjectName(p,key)}</b><small class="level-badge">שלב ${level}</small><small class="question-count">מאגר שאלות רחב ברמה זו</small></span><div class="level-adjust"><button class="${feedback==="up"?"selected":""}" data-adjust="${key}|up">קל מדי</button><button class="${feedback==="ok"?"selected":""}" data-adjust="${key}|ok">מתאים</button><button class="${feedback==="down"?"selected":""}" data-adjust="${key}|down">קשה מדי</button></div></div></section>`;
   }).join("");
 }
 
@@ -486,7 +500,7 @@ function exportProgress(){
   const report={
     child:{name:p.name,age:p.age,buddy:p.buddy},
     summary:{stars:p.stars,answered:p.answered,correct:p.correct,minutes:p.minutes},
-    topics:p.subjects.map(key=>({topic:SUBJECTS[key].name,level:subjectLevel(p,key),completed:p.progress[key]?.completed||0,skills:p.skillLevels[key]})),
+    topics:p.subjects.map(key=>({topic:subjectName(p,key),level:subjectLevel(p,key),completed:p.progress[key]?.completed||0,skills:p.skillLevels[key]})),
     recent:p.log
   };
   const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json;charset=utf-8"});
@@ -499,6 +513,28 @@ function resetProgress(){
   if(!confirm(`לאפס את כל ההתקדמות של ${p.name}? הפעולה אינה ניתנת לביטול.`))return;
   Object.assign(p,{stars:0,streak:0,progress:{},log:[],correct:0,answered:0,minutes:0,daily:0,dailyDate:"",skillLevels:{},skillFeedback:{},recentQuestions:{}});
   prepareProfile(p); save(); renderAll(); renderDashboard();
+}
+
+function createAdultChallenge(){
+  let text;
+  do {
+    const template=Math.floor(Math.random()*3);
+    const a=12+Math.floor(Math.random()*13);
+    const b=4+Math.floor(Math.random()*6);
+    const c=3+Math.floor(Math.random()*17);
+    if(template===0){
+      adultChallengeAnswer=a*b-c;
+      text=`כמה הם ${a} כפול ${b}, פחות ${c}?`;
+    } else if(template===1){
+      adultChallengeAnswer=a*b+c;
+      text=`כמה הם ${a} כפול ${b}, ועוד ${c}?`;
+    } else {
+      adultChallengeAnswer=(a+b)*c;
+      text=`כמה הם הסכום של ${a} ו־${b}, כפול ${c}?`;
+    }
+  } while(text===lastAdultChallenge);
+  lastAdultChallenge=text;
+  $("#adultQuestion").textContent=text;
 }
 
 function chime(success){
@@ -514,6 +550,7 @@ function bindEvents(){
     const go=e.target.closest("[data-go]"); if(go)showScreen(go.dataset.go==="home"?"homeScreen":go.dataset.go);
     const close=e.target.closest("[data-close]"); if(close)closeModal(close.dataset.close);
     const sub=e.target.closest("[data-subject]"); if(sub)startGame(sub.dataset.subject);
+    const playSub=e.target.closest("[data-play-subject]"); if(playSub){closeModal("adventureModal");startGame(playSub.dataset.playSubject)}
     const ans=e.target.closest("[data-answer]"); if(ans)answer(ans.dataset.answer,ans);
     const prof=e.target.closest("[data-profile]"); if(prof){state.activeId=prof.dataset.profile;prepareProfile(activeProfile());save();closeModal("profileModal");renderAll();showScreen("homeScreen")}
     const edit=e.target.closest("[data-edit-profile]"); if(edit)openEdit(edit.dataset.editProfile);
@@ -528,14 +565,13 @@ function bindEvents(){
   $("#deleteProfile").onclick=deleteCurrentProfile;
   $("#customizeSubjects").onclick=()=>activeProfile()?openModal("subjectModal"):openCreate();
   $("#saveSubjects").onclick=()=>{const chosen=$$(".subject-toggle.selected").map(x=>x.dataset.toggleSubject);if(!chosen.length)return;activeProfile().subjects=chosen;save();closeModal("subjectModal");renderAll()};
-  $("#dashboardButton").onclick=()=>{if(!activeProfile())return openCreate();if(adultUnlocked)return showScreen("dashboardScreen");$("#adultAnswer").value="";$("#gateError").textContent="";openModal("adultGateModal")};
-  $("#adultGateForm").onsubmit=e=>{e.preventDefault();if($("#adultAnswer").value.trim()==="93"){adultUnlocked=true;closeModal("adultGateModal");showScreen("dashboardScreen")}else $("#gateError").textContent="התשובה אינה נכונה. נסו שוב."};
+  $("#dashboardButton").onclick=()=>{if(!activeProfile())return openCreate();createAdultChallenge();$("#adultAnswer").value="";$("#gateError").textContent="";openModal("adultGateModal")};
+  $("#adultGateForm").onsubmit=e=>{e.preventDefault();if(Number($("#adultAnswer").value.trim())===adultChallengeAnswer){closeModal("adultGateModal");showScreen("dashboardScreen")}else $("#gateError").textContent="התשובה אינה נכונה. נסו שוב."};
   $("#printReport").onclick=()=>window.print();
   $("#exportReport").onclick=exportProgress;
   $("#resetProgress").onclick=resetProgress;
-  $(".sound-toggle").onclick=e=>{state.sound=!state.sound;e.currentTarget.textContent=state.sound?"🔊":"🔇";save();if(state.sound)chime(true);else window.speechSynthesis?.cancel()};
-  $("#listenAgain").onclick=speakQuestion;
-  $("#continueButton").onclick=()=>{const p=activeProfile();if(!p)return openCreate();startGame(p.subjects[0])};
+  $(".sound-toggle").onclick=e=>{state.sound=!state.sound;e.currentTarget.textContent=state.sound?"🔊":"🔇";save();if(state.sound)chime(true)};
+  $("#continueButton").onclick=()=>{const p=activeProfile();if(!p)return openCreate();renderAdventureChoices();openModal("adventureModal")};
   $("#randomButton").onclick=()=>{const p=activeProfile();if(!p)return openCreate();startGame(p.subjects[Math.floor(Math.random()*p.subjects.length)])};
   $$(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{if(e.target===m&&m.id!=="createModal"&&!(!activeProfile()&&m.id==="profileModal"))closeModal(m.id)}));
 }
