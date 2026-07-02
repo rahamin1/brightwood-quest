@@ -276,7 +276,8 @@ function renderAll(){
   $("#profileName").textContent=p?.name||"שחקן חדש";
   $("#miniAvatar").textContent=p?.buddy||"🦊";
   $("#starCount").textContent=p?.stars||0;
-  $("#streakCount").textContent=p?.streak||0;
+  const streak=p?.streak||0;
+  $("#streakText").textContent=streak===1?"יום תרגול אחד":`${streak} ימים ברצף`;
   $(".sound-toggle").textContent=state.sound?"🔊":"🔇";
   const today=p?.dailyDate===new Date().toDateString()?p.daily||0:0;
   $("#dailyDone").textContent=`${Math.min(today,3)} / 3`;
